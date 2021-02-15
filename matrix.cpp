@@ -40,6 +40,14 @@ void Matrix::setElem(int i, int j, int value) {
 	arr[numColumn * i + j] = value;
 }
 
+void Matrix::addVal(int i, int j, int value) {
+	arr[numColumn * i + j] += value;
+}
+
+void Matrix::difVal(int i, int j, int value) {
+	arr[numColumn * i + j] -= value;
+}
+
 int Matrix::getElem(int i, int j) {
 	return arr[numColumn * i + j];
 }

@@ -21,6 +21,8 @@ public:
 	int currentNumEdge();
 	int getElem(int i, int j);
 	void setElem(int i, int j, int value);
+	void addVal(int i, int j, int value);
+	void difVal(int i, int j, int value);
 	int getNumLine();
 	int getNumColumn();
 	void setNumLine(int num);
