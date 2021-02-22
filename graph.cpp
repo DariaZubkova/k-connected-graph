@@ -244,6 +244,31 @@ Matrix Graph::get_ExtraMatrix() {
 	return m;
 }
 
+bool Graph::checkMinGraph() {
+	bool res = false;
+	std::vector<bool> results;
+	for (int i = 0; i < numLine; i++) {
+		for (int j = 0; j < numColumn; j++) {
+			if (matrix.getElem(i, j) == 1) {
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
+					res = (*this).algorithmEven();
+					results.push_back(res);
+					matrix.setElem(j, i, 1);
+				}
+				matrix.setElem(i, j, 1);
+			}
+		}
+	}
+	res = true;
+	for (auto r : results) {
+		if (r == true)
+			res = false;
+	}
+	return res;
+}
+
 int Graph::get_k() {
 	int nK = k;
 	return nK;

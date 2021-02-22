@@ -3,22 +3,24 @@
 #include <map>
 #include <queue>
 #include <utility>
+#include <string>
 
 //const int INF = 1000000000;
 
 
-bool compareMatrix(std::vector<Matrix>& arr_matr, Matrix& matrix) {
+bool compareMatrix(std::vector<Graph>& arr_graph, Matrix& matrix) {
 	int nL = matrix.getNumLine(), nC = matrix.getNumColumn();
 	bool res = true;
 	//matrix.PrintMatrix();
 	//std::cout << "COMPARE:" << std::endl;
-	for (auto v : arr_matr) {
+	for (auto v : arr_graph) {
 		res = true;
 		//v.PrintMatrix();
 		//std::cout << std::endl;
+		Matrix m = v.get_Matrix();
 		for (int i = 0; i < nL; i++) {
 			for (int j = 0; j < nC; j++) {
-				if (v.getElem(i, j) != matrix.getElem(i, j)) {
+				if (m.getElem(i, j) != matrix.getElem(i, j)) {
 					res = false;
 				}
 			}
@@ -31,7 +33,7 @@ bool compareMatrix(std::vector<Matrix>& arr_matr, Matrix& matrix) {
 	return res;
 }
 
-void fun(Graph& graph, int* num, int k, std::vector<Matrix>* arr_matr) { //перебор графов
+void fun(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //перебор графов
 	Matrix matrix = graph.get_Matrix();
 	int numLine = matrix.getNumLine();
 	int numColumn = matrix.getNumColumn();
@@ -59,12 +61,12 @@ void fun(Graph& graph, int* num, int k, std::vector<Matrix>* arr_matr) { //переб
 				//PrintMatrix(arr, numLine, numColumn);
 				//check
 				res = graph.algorithmEven();
-				if (res && !compareMatrix((*arr_matr), matrix)) {
-					std::cout << *num + 2 << std::endl;
-					(*arr_matr).push_back(matrix);
+				if (res && !compareMatrix((*arr_graph), matrix)) {
+					std::cout << *num + 1 << std::endl;
+					(*arr_graph).push_back(graph);
 				}
 				(*num) += 1;
-				fun(graph, num, k, arr_matr);
+				fun(graph, num, k, arr_graph);
 				//check
 				//algorithmEven(arr, numLine, numColumn);
 				matrix.setElem(i, j, 1);
@@ -78,9 +80,9 @@ void fun(Graph& graph, int* num, int k, std::vector<Matrix>* arr_matr) { //переб
 }
 
 int main(void) {
-	int numNode = 6;
+	int numNode = 4;
 	int numEdge = 0;
-	int k = 4;
+	int k = 2;
 	int numLine = numNode;
 	int numColumn = numNode;
 	Graph graph(numNode, k);
@@ -144,12 +146,12 @@ int main(void) {
 	std::cout << std::endl;
 	bool res;
 	int num = 0;
-	std::vector<Matrix> arr_matr;
+	std::vector<Graph> arr_graph;
 	res = graph.algorithmEven();
 	if (res) {
-		arr_matr.push_back(graph.get_Matrix());
+		arr_graph.push_back(graph);
 	}
-	fun(graph, &num, k, &arr_matr);
+	fun(graph, &num, k, &arr_graph);
 	int numVector = 0;
 	//std::vector<Matrix> arr_matr;
 
@@ -158,12 +160,24 @@ int main(void) {
 	Matrix matrix = graph.get_Matrix();
 	fun(matrix, &num, k, &arr_matr);*/
 	std::cout << std::endl;
-	for (auto v : arr_matr) {
+	bool r = false;
+	std::string str = "";
+	for (auto v : arr_graph) {
+		r = false;
 		std::cout << "Matrix number: " << numVector << std::endl;
-		v.PrintMatrix();
-		int numEdge = v.currentNumEdge();
+		Matrix m = v.get_Matrix();
+		m.PrintMatrix();
+		int numEdge = m.currentNumEdge();
 		std::cout << "numEdge " << numEdge << std::endl;
 		std::cout << "CONGRATULATE!!!! It is k-connected graph; k = " << k << std::endl;
+		r = v.checkMinGraph();
+		if (r == true) {
+			str = "true";
+		}
+		else {
+			str = "false";
+		}
+		std::cout << "Result of check min graph = " << str << std::endl;
 		std::cout << std::endl;
 		numVector++;
 	}

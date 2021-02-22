@@ -11,6 +11,7 @@ public:
 	void extraMatrix(int numI, int numJ);
 	Matrix get_Matrix();
 	Matrix get_ExtraMatrix();
+	bool checkMinGraph();
 	int get_k();
 	int get_numNode();
 	int get_numEdge();
