@@ -125,12 +125,16 @@ void printToFile(std::vector<Graph> graphs, std::string nameFile) {
 	if (f)
 	{
 		std::string str;
-
+		int number = 1;
 		for (auto f_graph : graphs)
 		{
 			int numLine = f_graph.get_numLine();
 			int numColumn = f_graph.get_numColumn();
 			Matrix m = f_graph.get_Matrix();
+			str = "N ";
+			str += std::to_string(number);
+			f << str << std::endl;
+			str = "";
 			for (int i = 0; i < numLine; i++) {
 				str = "T ";
 				str += std::to_string(i);
@@ -151,6 +155,8 @@ void printToFile(std::vector<Graph> graphs, std::string nameFile) {
 					}
 				}
 			}
+			number++;
+			f << std::endl;
 		}
 		f.close();
 	}
@@ -159,7 +165,7 @@ void printToFile(std::vector<Graph> graphs, std::string nameFile) {
 int main(void) {
 	int numNode = 6;
 	int numEdge = 0;
-	int k = 3;
+	int k = 4;
 	int numLine = numNode;
 	int numColumn = numNode;
 	Graph graph(numNode, k);
@@ -226,6 +232,6 @@ int main(void) {
 	arr_graph.clear();
 	min_graph.clear();
 	finish_graph.clear();
-	//check();
+	check();
 	return 0;
 }
