@@ -4,8 +4,8 @@ const int INF = 1000000000;
 
 class Graph {
 public:
-	Graph(){}
-	~Graph(){}
+	Graph() {}
+	~Graph() {}
 	Graph(int numNode_, int k_);
 	bool algorithmEven();
 	void extraMatrix(int numI, int numJ);

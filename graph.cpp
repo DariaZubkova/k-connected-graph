@@ -1,4 +1,4 @@
-#include"graph.h"
+п»ї#include "graph.h"
 #include<map>
 
 Graph::Graph(int numNode_, int k_) {
@@ -83,7 +83,7 @@ int Graph::dinic(Matrix f, std::vector<int> ptr, std::vector<int> d, int s, int 
 	int numColumn = extra_matrix.getNumColumn();
 	int maxFlow = 0;
 	int flow = 0;
-	while (bfs(f, d, s, t)) {// пересчитываем d[i], заодно проверяем достижима ли t из s
+	while (bfs(f, d, s, t)) {// ГЇГҐГ°ГҐГ±Г·ГЁГІГ»ГўГ ГҐГ¬ d[i], Г§Г Г®Г¤Г­Г® ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ Г¤Г®Г±ГІГЁГ¦ГЁГ¬Г  Г«ГЁ t ГЁГ§ s
 		for (int i = 0; i < numLine; i++)
 			ptr[i] = 0;
 		flow = dfs(s, INF, f, ptr, d, s, t);
@@ -109,14 +109,15 @@ Graph extraGraph(Graph& graph, int J) {
 			newMatrix.setElem(i, j, value);
 		}
 	}
-	int i = newNumLine - 1;
+	/*int i = newNumLine - 1;
 	int j = 0;
 	while (j < J) {
 		newMatrix.setElem(i, j, 1);
 		newMatrix.setElem(j, i, 1);
 		j++;
-	}
-	/*for (int i = 0; i < newNumLine; i++) {
+	}*/
+	int j = newNumColumn - 1;
+	for (int i = 0; i < newNumLine; i++) {
 		if (i < J) {
 			newMatrix.setElem(i, j, 1);
 		}
@@ -126,7 +127,7 @@ Graph extraGraph(Graph& graph, int J) {
 		if (j < J) {
 			newMatrix.setElem(i, j, 1);
 		}
-	}*/
+	}
 	Graph newGraph;
 	newGraph.set_k(graph.get_k());
 	newGraph.set_num(graph.get_num());
@@ -163,10 +164,10 @@ bool Graph::algorithmEven() {
 		}
 	}
 	int pos_s = matrix.getNumColumn();
-	Graph newGraph = extraGraph((*this), k);
+	//Graph newGraph = extraGraph((*this), k);
 	for (int j = k; j < matrix.getNumColumn(); j++) {
-		//Graph newGraph = extraGraph((*this), j);
-		newGraph.addEdge(j, pos_s);
+		Graph newGraph = extraGraph((*this), j);
+		//newGraph.addEdge(j, pos_s);
 		newGraph.extraMatrix(j, pos_s);
 		Matrix extraMatrix = newGraph.get_ExtraMatrix();
 		Matrix f(extraMatrix.getNumLine(), extraMatrix.getNumColumn());
@@ -267,13 +268,21 @@ void Graph::set_minimality(bool res) {
 }
 
 bool Graph::checkMinGraph() {
-	bool res = false;
-	std::vector<bool> results;
+	//bool res = false;
+	//std::vector<bool> results;
 	int maxFlow = 0;
-	std::cout << "Check minimality" << std::endl;
+	std::vector<int> dVertex;
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex.push_back(s);
+	}
+	//std::cout << "Check minimality" << std::endl;
 	for (int i = 0; i < numLine; i++) {
 		for (int j = i + 1; j < numColumn; j++) {
-			if (matrix.getElem(i, j) == 1) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
 				matrix.setElem(i, j, 0);
 				if (matrix.getElem(j, i) == 1) {
 					matrix.setElem(j, i, 0);
@@ -287,68 +296,38 @@ bool Graph::checkMinGraph() {
 					std::vector<int> ptr(extra_matrix.getNumLine());
 					std::vector<int> d(extra_matrix.getNumLine());
 					maxFlow = (*this).dinic(f, ptr, d, i, j);
-					if (maxFlow < k) {
+					if (maxFlow >= k) {
+						//res = true;
+						return false;
+					}
+					/*else {
 						res = false;
-					}
-					else {
-						res = true;
-					}
-					results.push_back(res);
+					}*/
+					//results.push_back(res);
 					matrix.setElem(j, i, 1);
 				}
 				matrix.setElem(i, j, 1);
 			}
-			std::cout << "Checked edge (" << i << ", " << j << ")" << std::endl;
+			//std::cout << "Checked edge (" << i << ", " << j << ")" << std::endl;
 		}
 	}
-	res = true;
+	return true;
+	/*res = true;
 	for (auto r : results) {
 		if (r == true)
 			res = false;
 	}
-	return res;
+	return res;*/
 }
 
 bool Graph::checkContractionMinmality() {
 	bool res = false;
-	std::vector<bool> results;
-	std::vector<int> arr_line_ik;
-	std::vector<int> arr_column_jk;
-	std::vector<int> arr_line_ki;
-	std::vector<int> arr_column_kj;
+	//std::vector<bool> results;
 	int maxFlow = 0;
-	for (int k = 0; k < numLine; k++) {
-		arr_line_ik.push_back(0);
-		arr_column_jk.push_back(0);
-		arr_line_ki.push_back(0);
-		arr_column_kj.push_back(0);
-	}
-	std::cout << "Check contraction minimality" << std::endl;
+	//std::cout << "Check contraction minimality" << std::endl;
 	for (int i = 0; i < numLine; i++) {
 		for (int j = i + 1; j < numColumn; j++) {
 			if (matrix.getElem(i, j) == 1) {
-				/*for (int k = 0; k < numLine; k++) {
-					if (matrix.getElem(i, k) == 1) {
-						matrix.setElem(i, k, 0);
-						arr_line_ik[k] = 1;
-					}
-					if (matrix.getElem(k, i) == 1) {
-						matrix.setElem(k, i, 0);
-						arr_line_ki[k] = 1;
-					}
-					if (matrix.getElem(j, k) == 1) {
-						matrix.setElem(j, k, 0);
-						arr_column_jk[k] = 1;
-					}
-					if (matrix.getElem(k, j) == 1) {
-						matrix.setElem(k, j, 0);
-						arr_column_kj[k] = 1;
-					}
-				}*/
-
-				//matrix.PrintMatrix();
-				//std::cout << std::endl;
-
 				Graph new_graph(numNode - 2, k - 1);
 				Matrix new_matrix(numNode - 2, numNode - 2);
 				int pos_i = 0, pos_j = 0;
@@ -364,38 +343,24 @@ bool Graph::checkContractionMinmality() {
 						pos_i++;
 					}
 				}
-				//new_matrix.PrintMatrix();
-				//std::cout << std::endl;
 				new_graph.set_Matrix(new_matrix);
 
-				//(*this).set_k(k - 1);
-
 				res = new_graph.algorithmEven();
-				results.push_back(res);
-
-				//(*this).set_k(k + 1);
-
-				/*
-				for (int k = 0; k < numLine; k++) {
-					matrix.setElem(i, k, arr_line_ik[k]);
-					matrix.setElem(k, i, arr_line_ki[k]);
-					matrix.setElem(j, k, arr_column_jk[k]);
-					matrix.setElem(k, j, arr_column_kj[k]);
-					arr_line_ik[k] = 0;
-					arr_column_jk[k] = 0;
-					arr_line_ki[k] = 0;
-					arr_column_kj[k] = 0;
-				}*/
+				if (res == true) {
+					return false;
+				}
+				//results.push_back(res);
 			}
-			std::cout << "Checked edge (" << i << ", " << j << ")" << std::endl;
+			//std::cout << "Checked edge (" << i << ", " << j << ")" << std::endl;
 		}
 	}
-	res = true;
+	return true;
+	/*res = true;
 	for (auto r : results) {
 		if (r == true)
 			res = false;
 	}
-	return res;
+	return res;*/
 }
 
 void Graph::set_minContraction(bool res) {
