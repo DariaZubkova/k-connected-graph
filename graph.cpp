@@ -1,10 +1,6 @@
-﻿#include "graph.h"
-#include<map>
-#include <thread>
-#include <mutex>
-#include<omp.h>
+﻿#include"graph.h"
 
-std::mutex mtx_graph;
+#include<map>
 
 Graph::Graph(int numNode_, int k_) {
 	numNode = numNode_;
@@ -83,19 +79,11 @@ int Graph::dfs(int u, int minFlow, Matrix& f, std::vector<int>& ptr, std::vector
 	return 0;
 }
 
-int Graph::dinic(int s, int t) {
+int Graph::dinic(Matrix f, std::vector<int> ptr, std::vector<int> d, int s, int t) {
 	int numLine = extra_matrix.getNumLine();
 	int numColumn = extra_matrix.getNumColumn();
 	int maxFlow = 0;
 	int flow = 0;
-	Matrix f(extra_matrix.getNumLine(), extra_matrix.getNumColumn());
-	for (int h = 0; h < extra_matrix.getNumLine(); h++) {
-		for (int l = 0; l < extra_matrix.getNumColumn(); l++) {
-			f.setElem(h, l, 0);
-		}
-	}
-	std::vector<int> ptr(extra_matrix.getNumLine());
-	std::vector<int> d(extra_matrix.getNumLine());
 	while (bfs(f, d, s, t)) {// ïåðåñ÷èòûâàåì d[i], çàîäíî ïðîâåðÿåì äîñòèæèìà ëè t èç s
 		for (int i = 0; i < numLine; i++)
 			ptr[i] = 0;
@@ -159,16 +147,18 @@ void Graph::addEdge(int J, int pos_s) {
 
 bool Graph::algorithmEven() {
 	int maxFlow = -1;
-//#pragma omp parallel for shared(maxFlow, this)
-//#pragma omp parallel for
 	for (int j = 1; j < k; j++) {
-//#pragma omp parallel for
 		for (int i = 0; i < j; i++) {
-			//Graph gr = (*this);
 			(*this).extraMatrix(i, j);
-			//gr.extraMatrix(i, j);
-			maxFlow = (*this).dinic(i, j);
-			//maxFlow = gr.dinic(f, ptr, d, i, j);
+			Matrix f(extra_matrix.getNumLine(), extra_matrix.getNumColumn());
+			for (int i = 0; i < extra_matrix.getNumLine(); i++) {
+				for (int j = 0; j < extra_matrix.getNumColumn(); j++) {
+					f.setElem(i, j, 0);
+				}
+			}
+			std::vector<int> ptr(extra_matrix.getNumLine());
+			std::vector<int> d(extra_matrix.getNumLine());
+			maxFlow = (*this).dinic(f, ptr, d, i, j);
 			if (maxFlow < k) {
 				return false;
 			}
@@ -176,13 +166,20 @@ bool Graph::algorithmEven() {
 	}
 	int pos_s = matrix.getNumColumn();
 	Graph newGraph = extraGraph((*this), k);
-//#pragma omp parallel for
 	for (int j = k; j < matrix.getNumColumn(); j++) {
 		//Graph newGraph = extraGraph((*this), j);
 		newGraph.addEdge(j, pos_s);
 		newGraph.extraMatrix(j, pos_s);
 		Matrix extraMatrix = newGraph.get_ExtraMatrix();
-		maxFlow = newGraph.dinic(j, pos_s);
+		Matrix f(extraMatrix.getNumLine(), extraMatrix.getNumColumn());
+		for (int i = 0; i < extraMatrix.getNumLine(); i++) {
+			for (int j = 0; j < extraMatrix.getNumColumn(); j++) {
+				f.setElem(i, j, 0);
+			}
+		}
+		std::vector<int> ptr(extraMatrix.getNumLine());
+		std::vector<int> d(extraMatrix.getNumLine());
+		maxFlow = newGraph.dinic(f, ptr, d, j, pos_s);
 		//std::cout << "maxFlow " << maxFlow << std::endl;
 		if (maxFlow < k) {
 			return false;
@@ -286,12 +283,20 @@ bool Graph::checkMinGraph() {
 	//std::cout << "Check minimality" << std::endl;
 	for (int i = 0; i < numLine; i++) {
 		for (int j = i + 1; j < numColumn; j++) {
-			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k&& dVertex[j] > k) {
 				matrix.setElem(i, j, 0);
 				if (matrix.getElem(j, i) == 1) {
 					matrix.setElem(j, i, 0);
 					(*this).extraMatrix(i, j);
-					maxFlow = (*this).dinic(i, j);
+					Matrix f(extra_matrix.getNumLine(), extra_matrix.getNumColumn());
+					for (int i = 0; i < extra_matrix.getNumLine(); i++) {
+						for (int j = 0; j < extra_matrix.getNumColumn(); j++) {
+							f.setElem(i, j, 0);
+						}
+					}
+					std::vector<int> ptr(extra_matrix.getNumLine());
+					std::vector<int> d(extra_matrix.getNumLine());
+					maxFlow = (*this).dinic(f, ptr, d, i, j);
 					if (maxFlow >= k) {
 						//res = true;
 						return false;

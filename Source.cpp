@@ -1,5 +1,5 @@
-﻿#include "graph.h"
-#include "matrix.h"
+﻿#include"graph.h"
+#include"matrix.h"
 #include <map>
 #include <queue>
 #include <utility>
@@ -10,7 +10,6 @@
 #include <mutex>
 #include <chrono>
 #include <functional>
-#include<omp.h>
 
 std::mutex mtx;
 std::vector<Graph> array_graph;
@@ -59,7 +58,7 @@ void fun(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïå�
 	}
 	for (int i = 0; i < numLine - 1; i++) {
 		for (int j = i + 1; j < numColumn; j++) {
-			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k&& dVertex[j] > k) {
 				matrix.setElem(i, j, 0);
 				if (matrix.getElem(j, i) == 1) {
 					matrix.setElem(j, i, 0);
@@ -218,7 +217,7 @@ private:
 
 //std::function <void(Graph&, int, std::vector<Graph>*)> fun_thread = [](Graph& graph, int k, std::vector<Graph>* arr_graph)
 
-void fun_thread(Graph& graph, int k, std::vector<Graph>* arr_graph) { //ïåðåáîð ãðàôîâ
+void fun_thread(Graph& graph, int k) { //ïåðåáîð ãðàôîâ
 	Matrix matrix = graph.get_Matrix();
 	int numLine = matrix.getNumLine();
 	int numColumn = matrix.getNumColumn();
@@ -247,16 +246,15 @@ void fun_thread(Graph& graph, int k, std::vector<Graph>* arr_graph) { //ïåðå
 				//PrintMatrix(arr, numLine, numColumn);
 				//check
 				res = graph.algorithmEven();
-				if (res && !compareMatrix((*arr_graph), matrix)) {
+				if (res && !compareMatrix(array_graph, matrix)) {
 					//std::cout << *num + 1 << std::endl;
 					std::lock_guard<std::mutex> lock(mtx);
 					//mutex_graph.lock();
-					//array_graph.push_back(graph);
-					(*arr_graph).push_back(graph);
+					array_graph.push_back(graph);
 					//mutex_graph.unlock();
 				}
 
-				fun_thread(graph, k, arr_graph);
+				fun_thread(graph, k);
 
 				dVertex[i]++;
 				dVertex[j]++;
@@ -269,7 +267,7 @@ void fun_thread(Graph& graph, int k, std::vector<Graph>* arr_graph) { //ïåðå
 	dVertex.clear();
 }
 
-void thread_graph(Graph& graph, int k, std::vector<Graph>* arr_graph) {
+void thread_graph(Graph& graph, int k) {
 	Matrix matrix = graph.get_Matrix();
 	int numLine = matrix.getNumLine();
 	int numColumn = matrix.getNumColumn();
@@ -277,10 +275,7 @@ void thread_graph(Graph& graph, int k, std::vector<Graph>* arr_graph) {
 	int maxFlow;
 	std::vector<std::thread> threads;
 	std::vector<int> dVertex;
-#pragma omp parallel for //shared(arr_graph)
-//#pragma omp parallel for default(none), private(i,j), shared(array_graph) collapse(2)
 	for (int i = 0; i < numLine - 1; i++) {
-//#pragma omp parallel for shared(arr_graph)
 		for (int j = i + 1; j < numColumn; j++) {
 			Graph gr = graph;
 			Matrix m = gr.get_Matrix();
@@ -291,7 +286,7 @@ void thread_graph(Graph& graph, int k, std::vector<Graph>* arr_graph) {
 				}
 				dVertex.push_back(s);
 			}
-			if (m.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
+			if (m.getElem(i, j) == 1 && dVertex[i] > k&& dVertex[j] > k) {
 				m.setElem(i, j, 0);
 				if (m.getElem(j, i) == 1) {
 					m.setElem(j, i, 0);
@@ -304,19 +299,20 @@ void thread_graph(Graph& graph, int k, std::vector<Graph>* arr_graph) {
 				//PrintMatrix(arr, numLine, numColumn);
 				//check
 				res = gr.algorithmEven();
-				if (res && !compareMatrix((*arr_graph), m)) {
+				if (res && !compareMatrix(array_graph, m)) {
 					//std::cout << *num + 1 << std::endl;
 					std::lock_guard<std::mutex> lock(mtx);
-					(*arr_graph).push_back(gr);
+					array_graph.push_back(gr);
 
 				}
-				fun_thread(gr, k, arr_graph);
-				//std::thread thr(fun_thread, std::ref(gr), k);
+
+				std::thread thr(&fun_thread, std::ref(gr), k);
+				threads.push_back(std::move(thr));
 				//threads.emplace_back(std::move(thr));
-				//std::thread t(fun_thread, std::ref(gr), k);
+				//std::thread t(&fun_thread, std::ref(gr), k);
 				//t.detach();
 				//threads_graph.push_back(std::move(t));
-				//threads_graph.push_back(std::thread(fun_thread, gr, k, arr_graph));
+				//threads_graph.push_back(std::thread(&fun_thread, std::ref(gr), k, arr_graph));
 				//fun_thread(gr, k, arr_graph);
 
 				dVertex[i]++;
@@ -326,14 +322,12 @@ void thread_graph(Graph& graph, int k, std::vector<Graph>* arr_graph) {
 				gr.set_Matrix(matrix);
 			}
 			dVertex.clear();
-			//std::cout << "end circle j" << std::endl;
 		}
-		//std::cout << "end circle i" << std::endl;
 	}
 	//dVertex.clear();
-	//for (auto& thr : threads) {
-	//	thr.detach();
-	//}
+	for (auto& thr : threads) {
+		thr.detach();
+	}
 	//for (int i = 0; i < threads.size(); i++) {
 	//	threads_graph[i].detach();
 	//}
@@ -441,17 +435,17 @@ int main(void) {
 	res = graph.algorithmEven();
 	if (res) {
 		arr_graph.push_back(graph);
-		//array_graph.push_back(graph);
+		array_graph.push_back(graph);
 	}
 	//fun(graph, &num, k, &arr_graph);
 	//Thread_Graph th;
 	//th.thread_graph(graph, k);
 	//arr_graph = th.get_array();
-	thread_graph(graph, k, &arr_graph);
+	thread_graph(graph, k);
 	int numVector = 0;
 
 	//check_k_connected(arr_graph);	
-	//arr_graph = array_graph;
+	arr_graph = array_graph;
 	std::cout << std::endl;
 	bool r = false;
 	std::string str = "";
