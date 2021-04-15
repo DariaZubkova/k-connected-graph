@@ -29,7 +29,7 @@ public:
 	void set_num(int n);
 	bool bfs(Matrix& f, std::vector<int>& d, int s, int t);
 	int dfs(int u, int minFlow, Matrix& f, std::vector<int>& ptr, std::vector<int>& d, int s, int t);
-	int dinic(Matrix f, std::vector<int> ptr, std::vector<int> d, int s, int t);
+	int dinic(int s, int t);
 	void set_minimality(bool res);
 	void set_minContraction(bool res);
 	void addEdge(int J, int pos_s);
