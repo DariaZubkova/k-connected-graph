@@ -42,12 +42,11 @@ bool compareMatrix(std::vector<Graph>& arr_graph, Matrix& matrix) {
 	return res;
 }
 
-void fun(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïåðåáîð ãðàôîâ
+void fun_fun2(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïåðåáîð ãðàôîâ
 	Matrix matrix = graph.get_Matrix();
 	int numLine = matrix.getNumLine();
 	int numColumn = matrix.getNumColumn();
 	bool res = false;
-	int maxFlow;
 	std::vector<int> dVertex;
 	for (int i = 0; i < numLine; i++) {
 		int s = 0;
@@ -56,7 +55,53 @@ void fun(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïå�
 		}
 		dVertex.push_back(s);
 	}
-	for (int i = 0; i < numLine - 1; i++) {
+	for (int i = 0; i < numLine - 1; i++) { //numLine - 1
+		for (int j = i + 1; j < numColumn; j++) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
+				}
+				dVertex[i]--;
+				dVertex[j]--;
+				graph.set_Matrix(matrix);
+				//std::cout << "Delete " << i << " " << j << std::endl;
+				//(*num)++;
+				//PrintMatrix(arr, numLine, numColumn);
+				//check
+				res = graph.algorithmEven();
+				if (res && !compareMatrix((*arr_graph), matrix)) {
+					//std::cout << *num + 1 << std::endl;
+					(*arr_graph).push_back(graph);
+				}
+				(*num) += 1;
+				fun_fun2(graph, num, k, arr_graph);
+				dVertex[i]++;
+				dVertex[j]++;
+				matrix.setElem(i, j, 1);
+				matrix.setElem(j, i, 1);
+				graph.set_Matrix(matrix);
+			}
+		}
+	}
+	dVertex.clear();
+}
+
+
+void fun(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïåðåáîð ãðàôîâ
+	Matrix matrix = graph.get_Matrix();
+	int numLine = matrix.getNumLine();
+	int numColumn = matrix.getNumColumn();
+	bool res = false;
+	std::vector<int> dVertex;
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex.push_back(s);
+	}
+	for (int i = 4; i < 5; i++) { //numLine - 1
 		for (int j = i + 1; j < numColumn; j++) {
 			if (matrix.getElem(i, j) == 1 && dVertex[i] > k&& dVertex[j] > k) {
 				matrix.setElem(i, j, 0);
@@ -76,7 +121,7 @@ void fun(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïå�
 					(*arr_graph).push_back(graph);
 				}
 				(*num) += 1;
-				fun(graph, num, k, arr_graph);
+				fun_fun2(graph, num, k, arr_graph);
 				dVertex[i]++;
 				dVertex[j]++;
 				matrix.setElem(i, j, 1);
@@ -217,13 +262,109 @@ private:
 
 //std::function <void(Graph&, int, std::vector<Graph>*)> fun_thread = [](Graph& graph, int k, std::vector<Graph>* arr_graph)
 
-void fun_thread(Graph& graph, int k) { //ïåðåáîð ãðàôîâ
+
+void fun_thread2(Graph graph, int k) { //ïåðåáîð ãðàôîâ
+	Graph gr = graph;
 	Matrix matrix = graph.get_Matrix();
 	int numLine = matrix.getNumLine();
 	int numColumn = matrix.getNumColumn();
 	bool res = false;
-	int maxFlow;
-	std::vector<int> dVertex;
+	std::vector<int> dVertex(numLine);
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex[i] = s;
+	}
+	for (int i = 0; i < numLine - 1; i++) {
+		for (int j = i + 1; j < numColumn; j++) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k&& dVertex[j] > k) {
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
+				}
+				dVertex[i]--;
+				dVertex[j]--;
+				graph.set_Matrix(matrix);
+				//std::cout << "Delete " << i << " " << j << std::endl;
+				//(*num)++;
+				//PrintMatrix(arr, numLine, numColumn);
+				//check
+				res = graph.algorithmEven();
+				if (res && !compareMatrix(array_graph, matrix)) {
+					//std::cout << *num + 1 << std::endl;
+					//mutex_graph.lock();
+					array_graph.push_back(graph);
+					//mutex_graph.unlock();
+				}
+
+				fun_thread2(graph, k);
+
+				dVertex[i]++;
+				dVertex[j]++;
+				matrix.setElem(i, j, 1);
+				matrix.setElem(j, i, 1);
+				graph.set_Matrix(matrix);
+			}
+		}
+	}
+	dVertex.clear();
+}
+
+
+void fun_thread(Graph graph, int k) { //ïåðåáîð ãðàôîâ
+	//std::cout << nn << std::endl;
+	//std::cout << "ID THREAD = " << std::this_thread::get_id() << std::endl;
+	Matrix matrix = graph.get_Matrix();
+	int numLine = matrix.getNumLine();
+	int numColumn = matrix.getNumColumn();
+	bool res = false;
+	std::vector<int> dVertex(numLine);
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex[i] = s;
+	}
+	for (int i = 0; i < numLine - 1; i++) {
+		for (int j = i + 1; j < numColumn; j++) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k&& dVertex[j] > k) {
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
+				}
+				graph.set_Matrix(matrix);
+				//(*num)++;
+				res = graph.algorithmEven();
+				if (res && !compareMatrix(array_graph, matrix)) {
+					//std::cout << *num + 1 << std::endl;
+					std::lock_guard<std::mutex> lock(mtx);
+					//mutex_graph.lock();
+					array_graph.push_back(graph);
+					//mutex_graph.unlock();
+				}
+
+				fun_thread(graph, k);
+
+				matrix.setElem(i, j, 1);
+				matrix.setElem(j, i, 1);
+				graph.set_Matrix(matrix);
+			}
+		}
+	}
+	dVertex.clear();
+}
+
+void f2(Graph graph, int k) {
+	std::cout << "ID THREAD = " << std::this_thread::get_id() << std::endl;
+	Graph gr = graph;
+	Matrix matrix = graph.get_Matrix();
+	int numLine = matrix.getNumLine();
+	int numColumn = matrix.getNumColumn();
+	bool res = false;
+	std::vector<int> dVertex(numLine);
 	for (int i = 0; i < numLine; i++) {
 		int s = 0;
 		for (int j = 0; j < numColumn; j++) {
@@ -248,13 +389,12 @@ void fun_thread(Graph& graph, int k) { //ïåðåáîð ãðàôîâ
 				res = graph.algorithmEven();
 				if (res && !compareMatrix(array_graph, matrix)) {
 					//std::cout << *num + 1 << std::endl;
-					std::lock_guard<std::mutex> lock(mtx);
 					//mutex_graph.lock();
 					array_graph.push_back(graph);
 					//mutex_graph.unlock();
 				}
 
-				fun_thread(graph, k);
+				fun_thread2(graph, k);
 
 				dVertex[i]++;
 				dVertex[j]++;
@@ -267,66 +407,384 @@ void fun_thread(Graph& graph, int k) { //ïåðåáîð ãðàôîâ
 	dVertex.clear();
 }
 
-void thread_graph(Graph& graph, int k) {
+int algo(Graph graph) {
+	int res = graph.algorithmEven();
+	return res;
+}
+
+void f3(Graph graph, int k) {
+	//std::cout << "ID THREAD = " << std::this_thread::get_id() << std::endl;
+	if (graph.matrix.arr.empty()) {
+		std::cout << "GOVNO =  " << std::this_thread::get_id() << std::endl;
+		return;
+	}
 	Matrix matrix = graph.get_Matrix();
 	int numLine = matrix.getNumLine();
 	int numColumn = matrix.getNumColumn();
 	bool res = false;
-	int maxFlow;
-	std::vector<std::thread> threads;
-	std::vector<int> dVertex;
+	std::vector<int> dVertex(numLine);
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex[i] = s;
+	}
 	for (int i = 0; i < numLine - 1; i++) {
 		for (int j = i + 1; j < numColumn; j++) {
-			Graph gr = graph;
-			Matrix m = gr.get_Matrix();
-			for (int i = 0; i < numLine; i++) {
-				int s = 0;
-				for (int j = 0; j < numColumn; j++) {
-					s += m.getElem(i, j);
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
 				}
-				dVertex.push_back(s);
+				//std::cout << "i = " << i << std::endl;
+				//std::cout << "j = " << j << std::endl;
+				graph.set_Matrix(matrix);
+				//(*num)++;
+				//res = graph.algorithmEven();
+				//res = algo(graph);
+				if (res && !compareMatrix(array_graph, matrix)) {
+					//std::cout << *num + 1 << std::endl;
+					std::lock_guard<std::mutex> lock(mtx);
+					//mutex_graph.lock();
+					array_graph.push_back(graph);
+					//mutex_graph.unlock();
+				}
+
+				//std::cout << "Next = " << std::this_thread::get_id() << std::endl;
+				f3(graph, k);
+
+				matrix.setElem(i, j, 1);
+				matrix.setElem(j, i, 1);
+				graph.set_Matrix(matrix);
+				//std::cout << "End = " << i << " " << j << std::endl;
 			}
-			if (m.getElem(i, j) == 1 && dVertex[i] > k&& dVertex[j] > k) {
+		}
+	}
+	dVertex.clear();
+}
+
+void f4(Graph graph, int k) {
+	//std::cout << "ID THREAD = " << std::this_thread::get_id() << std::endl;
+	if (graph.matrix.arr.empty()) {
+		std::cout << "GOVNO =  " << std::this_thread::get_id() << std::endl;
+		return;
+	}
+	std::vector<std::thread> threads;
+	Matrix matrix = graph.get_Matrix();
+	int numLine = matrix.getNumLine();
+	int numColumn = matrix.getNumColumn();
+	bool res = false;
+	std::vector<int> dVertex(numLine);
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex[i] = s;
+	}
+	for (int i = 0; i < numLine - 1; i++) {
+		for (int j = i + 1; j < numColumn; j++) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
+				}
+				//std::cout << "i = " << i << std::endl;
+				//std::cout << "j = " << j << std::endl;
+				graph.set_Matrix(matrix);
+				//(*num)++;
+				//res = graph.algorithmEven();
+				//res = algo(graph);
+				if (res && !compareMatrix(array_graph, matrix)) {
+					//std::cout << *num + 1 << std::endl;
+					std::lock_guard<std::mutex> lock(mtx);
+					//mutex_graph.lock();
+					array_graph.push_back(graph);
+					//mutex_graph.unlock();
+				}
+
+				//std::cout << "Next = " << std::this_thread::get_id() << std::endl;
+				//f(graph, k);
+				std::thread thr(f3, graph, k);
+				//threads.push_back(std::move(thr));
+				threads.emplace_back(std::move(thr));
+
+				matrix.setElem(i, j, 1);
+				matrix.setElem(j, i, 1);
+				graph.set_Matrix(matrix);
+				//std::cout << "End = " << i << " " << j << std::endl;
+			}
+		}
+	}
+	//dVertex.clear();
+	for (auto& thr : threads) {
+		thr.join();
+	}
+}
+
+void f5(Graph graph, int k) {
+	//std::cout << "ID THREAD = " << std::this_thread::get_id() << std::endl;
+	if (graph.matrix.arr.empty()) {
+		std::cout << "GOVNO =  " << std::this_thread::get_id() << std::endl;
+		return;
+	}
+	std::vector<std::thread> threads;
+	Matrix matrix = graph.get_Matrix();
+	int numLine = matrix.getNumLine();
+	int numColumn = matrix.getNumColumn();
+	bool res = false;
+	std::vector<int> dVertex(numLine);
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex[i] = s;
+	}
+	for (int i = 0; i < numLine - 1; i++) {
+		for (int j = i + 1; j < numColumn; j++) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
+				}
+				//std::cout << "i = " << i << std::endl;
+				//std::cout << "j = " << j << std::endl;
+				graph.set_Matrix(matrix);
+				//(*num)++;
+				//res = graph.algorithmEven();
+				//res = algo(graph);
+				if (res && !compareMatrix(array_graph, matrix)) {
+					//std::cout << *num + 1 << std::endl;
+					std::lock_guard<std::mutex> lock(mtx);
+					//mutex_graph.lock();
+					array_graph.push_back(graph);
+					//mutex_graph.unlock();
+				}
+
+				//std::cout << "Next = " << std::this_thread::get_id() << std::endl;
+				//f(graph, k);
+				std::thread thr(f4, graph, k);
+				//threads.push_back(std::move(thr));
+				threads.emplace_back(std::move(thr));
+
+				matrix.setElem(i, j, 1);
+				matrix.setElem(j, i, 1);
+				graph.set_Matrix(matrix);
+				//std::cout << "End = " << i << " " << j << std::endl;
+			}
+		}
+	}
+	//dVertex.clear();
+	for (auto& thr : threads) {
+		thr.join();
+	}
+}
+
+void f1(Graph graph, int k) {
+	//std::cout << "ID THREAD = " << std::this_thread::get_id() << std::endl;
+	if (graph.matrix.arr.empty()) {
+		std::cout << "GOVNO =  " << std::this_thread::get_id() << std::endl;
+		return;
+	}
+	std::vector<std::thread> threads;
+	Matrix matrix = graph.get_Matrix();
+	int numLine = matrix.getNumLine();
+	int numColumn = matrix.getNumColumn();
+	bool res = false;
+	std::vector<int> dVertex(numLine);
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex[i] = s;
+	}
+	for (int i = 0; i < numLine - 1; i++) {
+		for (int j = i + 1; j < numColumn; j++) {
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
+				}
+				//std::cout << "i = " << i << std::endl;
+				//std::cout << "j = " << j << std::endl;
+				graph.set_Matrix(matrix);
+				//(*num)++;
+				//res = graph.algorithmEven();
+				//res = algo(graph);
+				if (res && !compareMatrix(array_graph, matrix)) {
+					//std::cout << *num + 1 << std::endl;
+					std::lock_guard<std::mutex> lock(mtx);
+					//mutex_graph.lock();
+					array_graph.push_back(graph);
+					//mutex_graph.unlock();
+				}
+
+				//std::cout << "Next = " << std::this_thread::get_id() << std::endl;
+				//f(graph, k);
+				std::thread thr(f5, graph, k);
+				//threads.push_back(std::move(thr));
+				threads.emplace_back(std::move(thr));
+
+				matrix.setElem(i, j, 1);
+				matrix.setElem(j, i, 1);
+				graph.set_Matrix(matrix);
+				//std::cout << "End = " << i << " " << j << std::endl;
+			}
+		}
+	}
+	//dVertex.clear();
+	for (auto& thr : threads) {
+		thr.join();
+	}
+}
+
+
+void f(Graph graph, int k) {
+	std::cout << "ID THREAD = " << std::this_thread::get_id() << std::endl;
+	//if (graph.matrix.arr.empty()) {
+	//	std::cout << "GOVNO =  " << std::this_thread::get_id() << std::endl;
+	//	return;
+	//}
+	std::vector<std::thread> threads;
+	std::cout << "matrix get" << std::endl;
+	Matrix matrix = graph.get_Matrix();
+	int numLine = matrix.getNumLine();
+	int numColumn = matrix.getNumColumn();
+	bool res = false;
+	std::cout << "dVertex init" << std::endl;
+	std::vector<int> dVertex(numLine);
+	for (int i = 0; i < numLine; i++) {
+		int s = 0;
+		for (int j = 0; j < numColumn; j++) {
+			s += matrix.getElem(i, j);
+		}
+		dVertex[i] = s;
+	}
+	std::cout << "For i" << std::endl;
+	for (int i = 0; i < numLine - 1; i++) {
+		std::cout << "For j" << std::endl;
+		for (int j = i + 1; j < numColumn; j++) {
+			std::cout << "If" << std::endl;
+			matrix.PrintMatrix();
+			//for (int re = 0; re < numLine; re++) {
+			//	std::cout << "dVertex[" << re << "] = " << dVertex[re] << std::endl;
+			//}
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) { // problem!
+				std::cout << "sets" << std::endl;
+				matrix.setElem(i, j, 0);
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
+				}
+				//std::cout << "i = " << i << std::endl;
+				//std::cout << "j = " << j << std::endl;
+				std::cout << "set matrix" << std::endl;
+				graph.set_Matrix(matrix);
+				std::cout << "set matrix end" << std::endl;
+				//(*num)++;
+				//std::cout << "lock" << std::endl;
+				//std::lock_guard<std::mutex> lock(mtx);
+				std::cout << "Even" << std::endl;
+				res = graph.algorithmEven();
+				//res = algo(graph);
+				if (res && !compareMatrix(array_graph, matrix)) {
+					//std::cout << *num + 1 << std::endl;
+					//std::lock_guard<std::mutex> lock(mtx);
+					//mutex_graph.lock();
+					std::cout << "push res" << std::endl;
+					array_graph.push_back(graph);
+					//mutex_graph.unlock();
+				}
+
+				//std::cout << "Next = " << std::this_thread::get_id() << std::endl;
+				std::cout << "recursive" << std::endl;
+				f(graph, k);
+
+				matrix.setElem(i, j, 1);
+				matrix.setElem(j, i, 1);
+				graph.set_Matrix(matrix);
+				//std::cout << "End = " << i << " " << j << std::endl;
+			}
+		}
+	}
+	dVertex.clear();
+}
+
+
+void thread_graph(Graph& graph, int k) {
+	std::cout << "ID THREAD MAIN" << std::endl;
+	Matrix matrix = graph.get_Matrix();
+	int numLine = matrix.getNumLine();
+	int numColumn = matrix.getNumColumn();
+	bool res = false;
+	std::vector<std::thread> threads;
+	std::vector<int> dVertex(numLine);
+	for (int i = 0; i < numLine - 1; i++) { //numLine - 1
+		for (int j = i + 1; j < numColumn; j++) { //numColumn
+			Graph gr(graph.get_numNode(), graph.get_k());
+			Matrix m(numLine, numColumn);
+			for (int u = 0; u < numLine; u++) {
+				for (int l = 0; l < numColumn; l++) {
+					m.setElem(u,l, matrix.getElem(u, l));
+				}
+			}
+			//Matrix m = graph.get_Matrix();
+			gr.set_Matrix(m);
+			for (int h = 0; h < numLine; h++) {
+				int s = 0;
+				for (int l = 0; l < numColumn; l++) {
+					s += matrix.getElem(h, l);
+				}
+				dVertex[h] = s;
+			}
+			if (matrix.getElem(i, j) == 1 && dVertex[i] > k&& dVertex[j] > k) {
+				matrix.setElem(i, j, 0);
 				m.setElem(i, j, 0);
-				if (m.getElem(j, i) == 1) {
+				if (matrix.getElem(j, i) == 1) {
+					matrix.setElem(j, i, 0);
 					m.setElem(j, i, 0);
 				}
-				dVertex[i]--;
-				dVertex[j]--;
+				graph.set_Matrix(matrix);
 				gr.set_Matrix(m);
 				//std::cout << "Delete " << i << " " << j << std::endl;
 				//(*num)++;
 				//PrintMatrix(arr, numLine, numColumn);
 				//check
+				//res = graph.algorithmEven();
 				res = gr.algorithmEven();
-				if (res && !compareMatrix(array_graph, m)) {
+				//res = algo(graph);
+				if (res && !compareMatrix(array_graph, m)) { //matrix
 					//std::cout << *num + 1 << std::endl;
 					std::lock_guard<std::mutex> lock(mtx);
-					array_graph.push_back(gr);
+					array_graph.push_back(gr); //graph
 
 				}
 
-				std::thread thr(&fun_thread, std::ref(gr), k);
-				threads.push_back(std::move(thr));
-				//threads.emplace_back(std::move(thr));
+				std::thread thr(f, gr, k); //graph
+				//threads.push_back(std::move(thr));
+				threads.emplace_back(std::move(thr));
+				//threads.emplace_back(fun_thread, gr, k);
 				//std::thread t(&fun_thread, std::ref(gr), k);
 				//t.detach();
 				//threads_graph.push_back(std::move(t));
 				//threads_graph.push_back(std::thread(&fun_thread, std::ref(gr), k, arr_graph));
 				//fun_thread(gr, k, arr_graph);
 
-				dVertex[i]++;
-				dVertex[j]++;
-				m.setElem(i, j, 1);
-				m.setElem(j, i, 1);
-				gr.set_Matrix(matrix);
+				matrix.setElem(i, j, 1);
+				m.setElem(i, j, 0);
+				matrix.setElem(j, i, 1);
+				m.setElem(j, i, 0);
+				graph.set_Matrix(matrix);
+				gr.set_Matrix(m);
 			}
-			dVertex.clear();
+			//dVertex.clear();
 		}
 	}
 	//dVertex.clear();
 	for (auto& thr : threads) {
-		thr.detach();
+		thr.join();
 	}
 	//for (int i = 0; i < threads.size(); i++) {
 	//	threads_graph[i].detach();
@@ -420,7 +878,7 @@ void printToFile(std::vector<Graph> graphs, std::string nameFile) {
 int main(void) {
 	int numNode = 7;
 	int numEdge = 0;
-	int k = 5;
+	int k = 4;
 	int numLine = numNode;
 	int numColumn = numNode;
 	Graph graph(numNode, k);
@@ -430,6 +888,37 @@ int main(void) {
 	bool res;
 	int num = 0;
 	std::vector<Graph> arr_graph;
+	
+	/*Matrix matr(numLine, numColumn);
+	matr.setElem(0, 3, 1);
+	matr.setElem(0, 4, 1);
+	matr.setElem(0, 5, 1);
+	matr.setElem(0, 6, 1);
+	matr.setElem(1, 2, 1);
+	matr.setElem(1, 4, 1);
+	matr.setElem(1, 5, 1);
+	matr.setElem(1, 6, 1);
+	matr.setElem(2, 1, 1);
+	matr.setElem(2, 3, 1);
+	matr.setElem(2, 5, 1);
+	matr.setElem(2, 6, 1);
+	matr.setElem(3, 0, 1);
+	matr.setElem(3, 2, 1);
+	matr.setElem(3, 4, 1);
+	matr.setElem(3, 6, 1);
+	matr.setElem(4, 0, 1);
+	matr.setElem(4, 1, 1);
+	matr.setElem(4, 3, 1);
+	matr.setElem(4, 5, 1);
+	matr.setElem(5, 0, 1);
+	matr.setElem(5, 1, 1);
+	matr.setElem(5, 2, 1);
+	matr.setElem(5, 4, 1);
+	matr.setElem(6, 0, 1);
+	matr.setElem(6, 1, 1);
+	matr.setElem(6, 2, 1);
+	matr.setElem(6, 3, 1);
+	graph.set_Matrix(matr);*/
 
 	std::cout << std::endl;
 	res = graph.algorithmEven();
@@ -437,7 +926,10 @@ int main(void) {
 		arr_graph.push_back(graph);
 		array_graph.push_back(graph);
 	}
-	//fun(graph, &num, k, &arr_graph);
+	//unsigned int end_time = clock();
+	//unsigned int search_time = end_time - start_time;
+	//std::cout << "Time work = " << search_time / CLOCKS_PER_SEC << std::endl;
+	//..fun(graph, &num, k, &arr_graph);
 	//Thread_Graph th;
 	//th.thread_graph(graph, k);
 	//arr_graph = th.get_array();
@@ -447,6 +939,9 @@ int main(void) {
 	//check_k_connected(arr_graph);	
 	arr_graph = array_graph;
 	std::cout << std::endl;
+
+	//std::cout << "The end!" << std::endl;
+
 	bool r = false;
 	std::string str = "";
 	std::vector<Graph> min_graph;
@@ -492,6 +987,7 @@ int main(void) {
 	arr_graph.clear();
 	min_graph.clear();
 	finish_graph.clear();
+
 	//check();
 	return 0;
 }

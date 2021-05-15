@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include"matrix.h"
 
 void Matrix::PrintMatrix() {
 	for (int i = 0; i < numLine; i++) {
