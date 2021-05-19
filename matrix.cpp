@@ -1,4 +1,4 @@
-#include"matrix.h"
+#include "matrix.h"
 
 void Matrix::PrintMatrix() {
 	for (int i = 0; i < numLine; i++) {
@@ -49,7 +49,14 @@ void Matrix::difVal(int i, int j, int value) {
 }
 
 int Matrix::getElem(int i, int j) {
-	return arr[numColumn * i + j];
+	if (!arr.empty()) {
+		if (numColumn > 0) {
+			if (arr[numColumn * i + j] == 1) {
+				return arr[numColumn * i + j];
+			}
+		}
+	}
+	return 0;
 }
 
 Matrix::Matrix(int numLine = 0, int numColumn = 0) {

@@ -28,8 +28,8 @@ public:
 	void setNumLine(int num);
 	void setNumColumn(int num);
 	~Matrix();
-	std::vector<int> arr;
 private:
+	std::vector<int> arr;
 	int numLine;
 	int numColumn;
 };
