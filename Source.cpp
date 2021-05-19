@@ -340,7 +340,7 @@ void start_enumeration_graph(std::vector<Graph> all_arr_graph, int k) {
 				}
 				std::vector<Graph> graph_func;
 				graph_func.push_back(graph);
-				std::thread thr(perebor, graph_func, k);
+				std::thread thr(enumeration_graph, graph_func, k);
 				threads.emplace_back(std::move(thr));
 				//perebor(graph_func, k);
 				graph_func.erase(graph_func.begin());
