@@ -324,7 +324,7 @@ void start_enumeration_graph(std::vector<Graph> all_arr_graph, int k) {
 		}
 		dVertex[h] = s;
 	}
-	for (int i = 0; i < 1; i++) { //numLine - 1
+	for (int i = 0; i < numLine - 1; i++) { //numLine - 1
 		for (int j = i + 1; j < numColumn; j++) {
 			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
 				matrix.setElem(i, j, 0);
