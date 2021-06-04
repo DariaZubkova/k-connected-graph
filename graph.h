@@ -15,7 +15,6 @@ public:
 	void build(std::vector <std::vector <int> >& lay, int& n, int& s, int& t);
 	int Dinitz(int& s, int& t);
 	bool algorithmGalil();
-	bool connect(int s);
 
 
 	Graph(int numNode_, int k_);
@@ -27,7 +26,6 @@ public:
 	bool checkContractionMinmality();
 	bool perebor_vertex();
 	bool perebor_vertex_fun(int &num, std::vector<int> &index);
-	bool perebor_vertex_check();
 	int get_k();
 	int get_numNode();
 	int get_numEdge();

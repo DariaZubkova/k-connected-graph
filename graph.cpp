@@ -531,42 +531,6 @@ bool Graph::checkMinGraph() {
 	return true;
 }
 
-/*bool Graph::checkContractionMinmality() {
-	bool res = false;
-	int maxFlow = 0;
-	if (numLine <= 0 || numColumn <= 0 || numNode <= 0) {
-		return false;
-	}
-	for (int i = 0; i < numLine - 1; i++) {
-		for (int j = i + 1; j < numColumn; j++) {
-			if (matrix.getElem(i, j) == 1) {
-				Graph new_graph(numNode - 2, k - 1);
-				Matrix new_matrix(numNode - 2, numNode - 2);
-				int pos_i = 0, pos_j = 0;
-				for (int k = 0; k < numLine; k++) {
-					if (k != i && k != j) {
-						for (int l = 0; l < numColumn; l++) {
-							if (l != i && l != j) {
-								new_matrix.setElem(pos_i, pos_j, matrix.getElem(k, l));
-								pos_j++;
-							}
-						}
-						pos_j = 0;
-						pos_i++;
-					}
-				}
-				new_graph.set_Matrix(new_matrix);
-
-				res = new_graph.algorithmEven();
-				if (res == true) {
-					return false;
-				}
-			}
-		}
-	}
-	return true;
-}*/
-
 bool Graph::perebor_vertex_fun(int &num, std::vector<int> &index) {
 	bool res = false, res_comp = true;
 	int maxFlow = 0;
@@ -631,79 +595,6 @@ bool Graph::perebor_vertex_fun(int &num, std::vector<int> &index) {
 	return true;
 }
 
-bool Graph::perebor_vertex_check() {
-	bool res = false;
-	int maxFlow = 0;
-	if (numLine <= 0 || numColumn <= 0 || numNode <= 0) {
-		return false;
-	}
-	for (int i = 0; i < numNode; i++) {
-		for (int j = 0; j < numNode; j++) {
-			if (i != j) {
-				for (int t = 0; t < numNode; t++) {
-					if (i != t && j != t) {
-						for (int w = 0; w < numNode; w++) {
-							if (i != w && j != w && t != w) {
-								Graph new_graph(numNode - 4, k);
-								Matrix new_matrix(numNode - 4, numNode - 4);
-								int pos_i = 0, pos_j = 0;
-								for (int k = 0; k < numNode; k++) {
-									if (k != i && k != j && k != t && k != w) {
-										for (int l = 0; l < numNode; l++) {
-											if (l != i && l != j && l != t && l != w) {
-												new_matrix.setElem(pos_i, pos_j, matrix.getElem(k, l));
-												pos_j++;
-											}
-										}
-										pos_j = 0;
-										pos_i++;
-									}
-								}
-								new_graph.set_Matrix(new_matrix);
-
-								res = new_graph.algorithmEven();
-								if (res == true) {
-									return false;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return true;
-}
-
-bool Graph::connect(int s) {
-	std::queue<int> q; // очередь с вершинами, которые мы рассматриваем на данном этапе
-	q.push(s);
-	std::vector<bool> used(numNode); // логический массив, указывающий, посещена ли вершина
-	used[s] = true;
-	while (!q.empty()) // пока мы не обойдем все вершины, которые можно достигнуть из данной
-	{
-		int v = q.front();
-		q.pop(); // достаем из головы очереди одну вершину
-		for (size_t i = 0; i < numLine; ++i) //просмотрим все ребра, исходящие из данной вершины
-		{
-			if (matrix.getElem(v, i) > 0) {
-				int to = matrix.getElem(v, i);
-				if (!used[to]) // если текущая вершина еще не была посещена
-				{
-					used[to] = true; //отмечаем, что мы ее посетили
-					q.push(to); // помещаем в очередь
-				}
-			}
-		}
-	}
-	std::vector<bool>::iterator it;
-	it = find(used.begin(), used.end(), false); // проверяем, остались ли еще непосещенные вершины
-	if (it == used.end())
-		return true; // если все вершины посещены, то граф связный
-	else
-		return false;
-}
-
 bool Graph::perebor_vertex() {
 	bool res = false;
 	int maxFlow = 0;
@@ -751,44 +642,6 @@ bool Graph::perebor_vertex() {
 	}
 	return true;
 }
-
-/*bool Graph::perebor_vertex() {
-	bool res = false;
-	int maxFlow = 0;
-	if (numLine <= 0 || numColumn <= 0 || numNode <= 0) {
-		return false;
-	}
-	for (int i = 0; i < numNode; i++) {
-		for (int j = 0; j < numNode; j++) {
-			if (i != j) {
-				
-						Graph new_graph(numNode - 2, k);
-						Matrix new_matrix(numNode - 2, numNode - 2);
-						int pos_i = 0, pos_j = 0;
-						for (int k = 0; k < numNode; k++) {
-							if (k != i && k != j) {
-								for (int l = 0; l < numNode; l++) {
-									if (l != i && l != j) {
-										new_matrix.setElem(pos_i, pos_j, matrix.getElem(k, l));
-										pos_j++;
-									}
-								}
-								pos_j = 0;
-								pos_i++;
-							}
-						}
-						new_graph.set_Matrix(new_matrix);
-
-						res = new_graph.algorithmEven();
-						if (res == true) {
-							return false;
-						}
-
-			}
-		}
-	}
-	return true;
-}*/
 
 bool Graph::checkContractionMinmality() {
 	bool res = false;
