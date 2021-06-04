@@ -1,6 +1,6 @@
 #include "matrix.h"
 
-void Matrix::PrintMatrix() {
+void Matrix::printMatrix() {
 	for (int i = 0; i < numLine; i++) {
 		for (int j = 0; j < numColumn; j++) {
 			std::cout << arr[numColumn * i + j] << " ";
@@ -21,11 +21,15 @@ int Matrix::currentNumEdge() {
 }
 
 int Matrix::getNumLine() {
-	return numLine;
+	if (numLine > 0)
+		return numLine;
+	return 0;
 }
 
 int Matrix::getNumColumn() {
-	return numColumn;
+	if (numColumn > 0)
+		return numColumn;
+	return 0;
 }
 
 void Matrix::setNumLine(int num) {
@@ -51,7 +55,7 @@ void Matrix::difVal(int i, int j, int value) {
 int Matrix::getElem(int i, int j) {
 	if (!arr.empty()) {
 		if (numColumn > 0) {
-			if (arr[numColumn * i + j] == 1) {
+			if (arr[numColumn * i + j] > 0) {
 				return arr[numColumn * i + j];
 			}
 		}
@@ -62,10 +66,12 @@ int Matrix::getElem(int i, int j) {
 Matrix::Matrix(int numLine = 0, int numColumn = 0) {
 	this->numLine = numLine;
 	this->numColumn = numColumn;
-	std::vector<int> arr(numLine * numColumn);
+	std::vector<int> arr(numLine * numColumn, 0);
 	this->arr = arr;
 }
 
 Matrix::~Matrix() {
-	this->arr.clear();
+	if (!arr.empty()) {
+		this->arr.clear();
+	}
 }

@@ -1,5 +1,8 @@
 #pragma once
-#include"matrix.h"
+#include "matrix.h"
+#include <map>
+#include <vector>
+#include <list>
 
 const int INF = 1000000000;
 
@@ -7,6 +10,14 @@ class Graph {
 public:
 	Graph() {}
 	~Graph() {}
+
+	int DFS(std::list <std::pair <int, std::pair <int, int> > >& block, std::vector <std::vector <int> >& lay, int& n, int& s, int& t, int cost);
+	void build(std::vector <std::vector <int> >& lay, int& n, int& s, int& t);
+	int Dinitz(int& s, int& t);
+	bool algorithmGalil();
+	bool connect(int s);
+
+
 	Graph(int numNode_, int k_);
 	bool algorithmEven();
 	void extraMatrix(int numI, int numJ);
@@ -14,6 +25,9 @@ public:
 	Matrix get_ExtraMatrix();
 	bool checkMinGraph();
 	bool checkContractionMinmality();
+	bool perebor_vertex();
+	bool perebor_vertex_fun(int &num, std::vector<int> &index);
+	bool perebor_vertex_check();
 	int get_k();
 	int get_numNode();
 	int get_numEdge();
@@ -34,8 +48,8 @@ public:
 	void set_minimality(bool res);
 	void set_minContraction(bool res);
 	void addEdge(int J, int pos_s);
-	Matrix matrix;
 private:
+	Matrix matrix;
 	Matrix extra_matrix;
 	int numNode;
 	int numEdge;

@@ -16,8 +16,11 @@ typedef struct edge {
 class Matrix {
 public:
 	Matrix(int numLine, int numColumn);
-	Matrix() {}
-	void PrintMatrix();
+	Matrix() {
+		numLine = 0;
+		numColumn = 0;
+	} //инициализация
+	void printMatrix();
 	int currentNumEdge();
 	int getElem(int i, int j);
 	void setElem(int i, int j, int value);
