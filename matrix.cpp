@@ -75,3 +75,8 @@ Matrix::~Matrix() {
 		this->arr.clear();
 	}
 }
+
+void Matrix::nullArray() {
+	std::vector<int> arr(numLine * numColumn, 0);
+	this->arr = arr;
+}

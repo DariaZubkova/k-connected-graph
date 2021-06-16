@@ -14,7 +14,7 @@ bool compareMatrix(std::vector<Graph>& arr_graph, Matrix& matrix) {
 	if (arr_graph.empty()) {
 		return false;
 	}
-	for (int i = 0; i < arr_graph.size(); i++) { // auto v : arr_graph
+	for (size_t i = 0; i < arr_graph.size(); i++) {
 		Graph v = arr_graph[i];
 		res = true;
 		Matrix m = v.get_Matrix();
@@ -32,7 +32,7 @@ bool compareMatrix(std::vector<Graph>& arr_graph, Matrix& matrix) {
 	return res;
 }
 
-void fun_fun2(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïåðåáîð ãðàôîâ
+void fun(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïåðåáîð ãðàôîâ
 	Matrix matrix = graph.get_Matrix();
 	int numLine = matrix.getNumLine();
 	int numColumn = matrix.getNumColumn();
@@ -60,7 +60,7 @@ void fun_fun2(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //
 					(*arr_graph).push_back(graph);
 				}
 				(*num) += 1;
-				fun_fun2(graph, num, k, arr_graph);
+				fun(graph, num, k, arr_graph);
 				dVertex[i]++;
 				dVertex[j]++;
 				matrix.setElem(i, j, 1);
@@ -70,194 +70,6 @@ void fun_fun2(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //
 		}
 	}
 	dVertex.clear();
-}
-
-void fun(Graph& graph, int* num, int k, std::vector<Graph>* arr_graph) { //ïåðåáîð ãðàôîâ
-	Matrix matrix = graph.get_Matrix();
-	int numLine = matrix.getNumLine();
-	int numColumn = matrix.getNumColumn();
-	bool res = false;
-	std::vector<int> dVertex;
-	for (int i = 0; i < numLine; i++) {
-		int s = 0;
-		for (int j = 0; j < numColumn; j++) {
-			s += matrix.getElem(i, j);
-		}
-		dVertex.push_back(s);
-	}
-	for (int i = 0; i < 1; i++) { //numLine - 1
-		for (int j = i + 1; j < numColumn; j++) {
-			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
-				matrix.setElem(i, j, 0);
-				if (matrix.getElem(j, i) == 1) {
-					matrix.setElem(j, i, 0);
-				}
-				dVertex[i]--;
-				dVertex[j]--;
-				graph.set_Matrix(matrix);
-				res = graph.algorithmEven();
-				if (res && !compareMatrix((*arr_graph), matrix)) {
-					(*arr_graph).push_back(graph);
-				}
-				(*num) += 1;
-				fun_fun2(graph, num, k, arr_graph);
-				dVertex[i]++;
-				dVertex[j]++;
-				matrix.setElem(i, j, 1);
-				matrix.setElem(j, i, 1);
-				graph.set_Matrix(matrix);
-			}
-		}
-	}
-	dVertex.clear();
-}
-
-void f(Graph graph, int k) {
-	std::cout << "ID THREAD = " << std::this_thread::get_id() << std::endl;
-	//if (graph.matrix.arr.empty()) {
-	//	std::cout << "GOVNO =  " << std::this_thread::get_id() << std::endl;
-	//	return;
-	//}
-	std::vector<std::thread> threads;
-	//std::cout << "matrix get" << std::endl;
-	Matrix matrix = graph.get_Matrix();
-	int numLine = matrix.getNumLine();
-	int numColumn = matrix.getNumColumn();
-	bool res = false;
-	//std::cout << "dVertex init" << std::endl;
-	std::vector<int> dVertex(numLine);
-	for (int i = 0; i < numLine; i++) {
-		int s = 0;
-		for (int j = 0; j < numColumn; j++) {
-			s += matrix.getElem(i, j);
-		}
-		dVertex[i] = s;
-	}
-	for (int i = 0; i < numLine - 1; i++) {
-		std::cout << "For i = " << i << std::endl;
-		for (int j = i + 1; j < numColumn; j++) {
-			std::cout << "For j = " << j << std::endl;
-			//std::cout << "If" << std::endl;
-			//matrix.PrintMatrix();
-			//for (int re = 0; re < numLine; re++) {
-			//	std::cout << "dVertex[" << re << "] = " << dVertex[re] << std::endl;
-			//}
-			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) { // problem!
-				//std::cout << "sets" << std::endl;
-				matrix.setElem(i, j, 0);
-				if (matrix.getElem(j, i) == 1) {
-					matrix.setElem(j, i, 0);
-				}
-				//std::cout << "i = " << i << std::endl;
-				//std::cout << "j = " << j << std::endl;
-				//std::cout << "set matrix" << std::endl;
-				graph.set_Matrix(matrix);
-				//std::cout << "set matrix end" << std::endl;
-				//(*num)++;
-				//std::cout << "lock" << std::endl;
-				//std::lock_guard<std::mutex> lock(mtx);
-				//std::cout << "Even" << std::endl;
-				res = graph.algorithmEven();
-				//res = algo(graph);
-				if (res && !compareMatrix(array_graph, matrix)) {
-					//std::cout << *num + 1 << std::endl;
-					//std::lock_guard<std::mutex> lock(mtx);
-					//mutex_graph.lock();
-					//std::cout << "push res" << std::endl;
-					array_graph.push_back(graph);
-					//mutex_graph.unlock();
-				}
-
-				//std::cout << "Next = " << std::this_thread::get_id() << std::endl;
-				//std::cout << "recursive" << std::endl;
-				f(graph, k);
-
-				matrix.setElem(i, j, 1);
-				matrix.setElem(j, i, 1);
-				graph.set_Matrix(matrix);
-				//std::cout << "End = " << i << " " << j << std::endl;
-			}
-		}
-	}
-	dVertex.clear();
-}
-
-void thread_graph(Graph& graph, int k) {
-	std::cout << "ID THREAD MAIN" << std::endl;
-	Matrix matrix = graph.get_Matrix();
-	int numLine = matrix.getNumLine();
-	int numColumn = matrix.getNumColumn();
-	bool res = false;
-	std::vector<std::thread> threads;
-	std::vector<int> dVertex(numLine);
-	for (int i = 0; i < numLine - 1; i++) { //numLine - 1
-		for (int j = i + 1; j < numColumn; j++) { //numColumn
-			Graph gr(graph.get_numNode(), graph.get_k());
-			Matrix m(numLine, numColumn);
-			for (int u = 0; u < numLine; u++) {
-				for (int l = 0; l < numColumn; l++) {
-					m.setElem(u, l, matrix.getElem(u, l));
-				}
-			}
-			//Matrix m = graph.get_Matrix();
-			gr.set_Matrix(m);
-			for (int h = 0; h < numLine; h++) {
-				int s = 0;
-				for (int l = 0; l < numColumn; l++) {
-					s += matrix.getElem(h, l);
-				}
-				dVertex[h] = s;
-			}
-			if (matrix.getElem(i, j) == 1 && dVertex[i] > k && dVertex[j] > k) {
-				matrix.setElem(i, j, 0);
-				m.setElem(i, j, 0);
-				if (matrix.getElem(j, i) == 1) {
-					matrix.setElem(j, i, 0);
-					m.setElem(j, i, 0);
-				}
-				graph.set_Matrix(matrix);
-				gr.set_Matrix(m);
-				//std::cout << "Delete " << i << " " << j << std::endl;
-				//(*num)++;
-				//PrintMatrix(arr, numLine, numColumn);
-				//check
-				//res = graph.algorithmEven();
-				res = gr.algorithmEven();
-				//res = algo(graph);
-				if (res && !compareMatrix(array_graph, m)) { //matrix
-					//std::cout << *num + 1 << std::endl;
-					std::lock_guard<std::mutex> lock(mtx);
-					array_graph.push_back(gr); //graph
-
-				}
-
-				std::thread thr(f, gr, k); //graph
-				//threads.push_back(std::move(thr));
-				threads.emplace_back(std::move(thr));
-				//threads.emplace_back(fun_thread, gr, k);
-				//std::thread t(&fun_thread, std::ref(gr), k);
-				//t.detach();
-				//threads_graph.push_back(std::move(t));
-				//threads_graph.push_back(std::thread(&fun_thread, std::ref(gr), k, arr_graph));
-				//fun_thread(gr, k, arr_graph);
-
-				matrix.setElem(i, j, 1);
-				m.setElem(i, j, 0);
-				matrix.setElem(j, i, 1);
-				m.setElem(j, i, 0);
-				graph.set_Matrix(matrix);
-				gr.set_Matrix(m);
-			}
-			//dVertex.clear();
-		}
-	}
-	//dVertex.clear();
-	for (auto& thr : threads) {
-		thr.join();
-	}
-	//for (int i = 0; i < threads.size(); i++) {
-	//	threads_graph[i].detach();
-	//}
 }
 
 void enumeration_graph(std::vector<Graph> all_arr_graph, int k) {
@@ -372,37 +184,45 @@ void check_k_connected(std::vector<Graph> arr) {
 	std::cout << "END!" << std::endl;
 }
 
-void fromFileInGraph(std::string nameFile) {
-	std::fstream f;
-	Graph graph(20, 5);
-	Matrix matrix(20, 20);
-	f.open(nameFile, std::ios::out);
-	if (f)
+Graph fromFileInGraph(std::string nameFile) {
+	std::ifstream f;
+	std::string line;
+	int numNode = 0, k = 0;
+	int i = 0, j = 0, w = 0, value = 1;
+	Graph graph;
+	Matrix matrix;
+	f.open(nameFile);
+	while (f)
 	{
-		std::string str;
-		int numNode = 0;
-		int flag = 0;
-		int i = 0, j = 0, value = 1;
-		while (std::getline(f, str)) {
-			if (str[0] == 'T') {
-				std::string s = "";
-				int l = 2;
-				while (str[l] != '\n') {
-					s += str[l];
-				}
-				numNode = std::stoi(s) + 1;
+		f >> line;
+		if (line == "N") {
+			if (!(f >> numNode)) {
+				std::cout << "GG numNode" << std::endl;
 			}
-			if (str[0] == 'E') {
-				if (flag == 0) {
-					; //make matrix
-				}
-				flag = 1;
-				int l = 2;
-			}
-			
+			graph.set_numNode(numNode);
+			graph.set_numLine(numNode);
+			graph.set_numColumn(numNode);
+			matrix.setNumLine(numNode);
+			matrix.setNumColumn(numNode);
+			matrix.nullArray();
 		}
-		f.close();
+		else if (line == "K") {
+			if (!(f >> k)) {
+				std::cout << "GG k" << std::endl;
+			}
+			graph.set_k(k);
+		}
+		else if (line == "E") {
+			if (!(f >> i >> j >> w)) {
+				std::cout << "GG edge" << std::endl;
+			}
+			matrix.setElem(i, j, value);
+			matrix.setElem(j, i, value);
+		}
 	}
+	graph.set_Matrix(matrix);
+	f.close();
+	return graph;
 }
 
 void printToFile(std::vector<Graph> graphs, std::string nameFile) {
@@ -448,103 +268,14 @@ void printToFile(std::vector<Graph> graphs, std::string nameFile) {
 	}
 }
 
-void check0() {
-	int numNode = 15;
+void check_full() { // полные графы
+	int numNode = 50;
 	int numEdge = 0;
-	int k = 4;
+	int k = 7;
 	int numLine = numNode;
 	int numColumn = numNode;
 	Graph graph(numNode, k);
 
-	Matrix matr(numLine, numColumn);
-
-	//0
-	matr.setElem(0, 1, 1);
-	matr.setElem(1, 0, 1);
-	matr.setElem(0, 2, 1);
-	matr.setElem(2, 0, 1);
-	matr.setElem(0, 3, 1);
-	matr.setElem(3, 0, 1);
-	matr.setElem(0, 4, 1);
-	matr.setElem(4, 0, 1);
-	//1
-	matr.setElem(1, 2, 1);
-	matr.setElem(2, 1, 1);
-	matr.setElem(1, 5, 1);
-	matr.setElem(5, 1, 1);
-	matr.setElem(1, 6, 1);
-	matr.setElem(6, 1, 1);
-	//3
-	matr.setElem(2, 5, 1);
-	matr.setElem(5, 2, 1);
-	matr.setElem(2, 6, 1);
-	matr.setElem(6, 2, 1);
-	//4
-	matr.setElem(3, 7, 1);
-	matr.setElem(7, 3, 1);
-	matr.setElem(3, 8, 1);
-	matr.setElem(8, 3, 1);
-	matr.setElem(3, 11, 1);
-	matr.setElem(11, 3, 1);
-	matr.setElem(3, 13, 1);
-	matr.setElem(13, 3, 1);
-	//5
-	matr.setElem(4, 7, 1);
-	matr.setElem(7, 4, 1);
-	matr.setElem(4, 8, 1);
-	matr.setElem(8, 4, 1);
-	matr.setElem(4, 11, 1);
-	matr.setElem(11, 4, 1);
-	matr.setElem(4, 13, 1);
-	matr.setElem(13, 4, 1);
-	//7
-	matr.setElem(5, 9, 1);
-	matr.setElem(9, 5, 1);
-	matr.setElem(5, 10, 1);
-	matr.setElem(10, 5, 1);
-	matr.setElem(5, 12, 1);
-	matr.setElem(12, 5, 1);
-	matr.setElem(5, 14, 1);
-	matr.setElem(14, 5, 1);
-	//8
-	matr.setElem(6, 9, 1);
-	matr.setElem(9, 6, 1);
-	matr.setElem(6, 10, 1);
-	matr.setElem(10, 6, 1);
-	matr.setElem(6, 12, 1);
-	matr.setElem(12, 6, 1);
-	matr.setElem(6, 14, 1);
-	matr.setElem(14, 6, 1);
-	//9
-	matr.setElem(7, 8, 1);
-	matr.setElem(8, 7, 1);
-	matr.setElem(7, 9, 1);
-	matr.setElem(9, 7, 1);
-	matr.setElem(7, 10, 1);
-	matr.setElem(10, 7, 1);
-	//10
-	matr.setElem(8, 10, 1);
-	matr.setElem(10, 8, 1);
-	//11
-	matr.setElem(9, 10, 1);
-	matr.setElem(10, 9, 1);
-	//12
-	//13
-	matr.setElem(11, 13, 1);
-	matr.setElem(13, 11, 1);
-	matr.setElem(11, 14, 1);
-	matr.setElem(14, 11, 1);
-	//14
-	matr.setElem(12, 13, 1);
-	matr.setElem(13, 12, 1);
-	matr.setElem(12, 14, 1);
-	matr.setElem(14, 12, 1);
-	//15
-	matr.setElem(13, 14, 1);
-	matr.setElem(14, 13, 1);
-	//16
-
-	graph.set_Matrix(matr);
 	std::vector<Graph> gr;
 	gr.push_back(graph);
 	printToFile(gr, "out_gr.txt");
@@ -588,8 +319,8 @@ void check0() {
 	//std::cout << "Time work = " << search_time3 / CLOCKS_PER_SEC << std::endl;
 }
 
-void check() {
-	int numNode = 17;
+void check_regular() { //регулярные графы
+	int numNode = 100;
 	int numEdge = 0;
 	int k = 5;
 	int numLine = numNode;
@@ -597,8 +328,8 @@ void check() {
 	Graph graph(numNode, k);
 
 	Matrix matr(numLine, numColumn);
-	/*for (int i = 0; i < numLine; i++) {
-		for (int j = i+6; j < numColumn; j+=6) {
+	for (int i = 0; i < numLine; i++) {
+		for (int j = i+5; j < numColumn; j+=5) { //через какую вершину связаны
 			matr.setElem(i, j, 1);
 			matr.setElem(j, i, 1);
 		}
@@ -608,8 +339,61 @@ void check() {
 		}
 	}
 	matr.setElem(0, numNode - 1, 1);
-	matr.setElem(numNode - 1, 0, 1);*/
+	matr.setElem(numNode - 1, 0, 1);
 
+	graph.set_Matrix(matr);
+	std::vector<Graph> gr;
+	gr.push_back(graph);
+	printToFile(gr, "out_all.txt");
+
+	unsigned int start_time = clock();
+	bool res = false;
+	res = graph.algorithmEven();
+	//res = graph.algorithmGalil();
+	unsigned int end_time = clock();
+	unsigned int search_time = end_time - start_time;
+	if (res) {
+		std::cout << "Result k-coonected = true" << std::endl;
+	}
+	else {
+		std::cout << "Result k-coonected = false" << std::endl;
+	}
+	std::cout << "Time work = " << search_time << std::endl;
+	//std::cout << "Time work = " << search_time / CLOCKS_PER_SEC << std::endl;
+	res = graph.checkMinGraph();
+	unsigned int end_time2 = clock();
+	unsigned int search_time2 = end_time2 - end_time;
+	if (res) {
+		std::cout << "Result min = true" << std::endl;
+	}
+	else {
+		std::cout << "Result min = false" << std::endl;
+	}
+	std::cout << "Time work = " << search_time2 << std::endl;
+	//std::cout << "Time work = " << search_time2 / CLOCKS_PER_SEC << std::endl;
+	res = graph.checkContractionMinmality();
+	//res = graph.perebor_vertex_check();
+	unsigned int end_time3 = clock();
+	unsigned int search_time3 = end_time3 - end_time2;
+	if (res) {
+		std::cout << "Result contr min = true" << std::endl;
+	}
+	else {
+		std::cout << "Result contr min = false" << std::endl;
+	}
+	std::cout << "Time work = " << search_time3 << std::endl;
+	//std::cout << "Time work = " << search_time3 / CLOCKS_PER_SEC << std::endl;
+}
+
+void check5_valid() { // 5-связный граф из статьи
+	int numNode = 17;
+	int numEdge = 0;
+	int k = 5;
+	int numLine = numNode;
+	int numColumn = numNode;
+	Graph graph(numNode, k);
+
+	Matrix matr(numLine, numColumn);
 	//0
 	for (int i = 1; i < 6; i++) {
 		matr.setElem(0, i, 1);
@@ -723,8 +507,8 @@ void check() {
 
 	unsigned int start_time = clock();
 	bool res = false;
-	//res = graph.algorithmEven();
-	res = graph.algorithmGalil();
+	res = graph.algorithmEven();
+	//res = graph.algorithmGalil();
 	unsigned int end_time = clock();
 	unsigned int search_time = end_time - start_time;
 	if (res) {
@@ -760,90 +544,7 @@ void check() {
 	//std::cout << "Time work = " << search_time3 / CLOCKS_PER_SEC << std::endl;
 }
 
-void check4() {
-	int numNode = 6;
-	int numEdge = 0;
-	int k = 4;
-	int numLine = numNode;
-	int numColumn = numNode;
-	Graph graph(numNode, k);
-
-	Matrix matr(numLine, numColumn);
-	//0
-	matr.setElem(0, 1, 1);
-	matr.setElem(1, 0, 1);
-	matr.setElem(0, 2, 1);
-	matr.setElem(2, 0, 1);
-	matr.setElem(0, 4, 1);
-	matr.setElem(4, 0, 1);
-	matr.setElem(0, 5, 1);
-	matr.setElem(5, 0, 1);
-	//1
-	matr.setElem(1, 2, 1);
-	matr.setElem(2, 1, 1);
-	matr.setElem(1, 3, 1);
-	matr.setElem(3, 1, 1);
-	matr.setElem(1, 5, 1);
-	matr.setElem(5, 1, 1);
-	//2
-	matr.setElem(2, 3, 1);
-	matr.setElem(3, 2, 1);
-	matr.setElem(2, 4, 1);
-	matr.setElem(4, 2, 1);
-	//3
-	matr.setElem(3, 4, 1);
-	matr.setElem(4, 3, 1);
-	matr.setElem(3, 5, 1);
-	matr.setElem(5, 3, 1);
-	//4
-	matr.setElem(4, 5, 1);
-	matr.setElem(5, 4, 1);
-
-	graph.set_Matrix(matr);
-	std::vector<Graph> gr;
-	gr.push_back(graph);
-	printToFile(gr, "out_gr.txt");
-
-
-	unsigned int start_time = clock();
-	bool res = false;
-
-	res = graph.algorithmEven();
-	unsigned int end_time = clock();
-	unsigned int search_time = end_time - start_time;
-	if (res) {
-		std::cout << "Result k-coonected = true" << std::endl;
-	}
-	else {
-		std::cout << "Result k-coonected = false" << std::endl;
-	}
-	std::cout << "Time work = " << search_time << std::endl;
-	//std::cout << "Time work = " << search_time / CLOCKS_PER_SEC << std::endl;
-	res = graph.checkMinGraph();
-	unsigned int end_time2 = clock();
-	unsigned int search_time2 = end_time2 - end_time;
-	if (res) {
-		std::cout << "Result min = true" << std::endl;
-	}
-	else {
-		std::cout << "Result min = false" << std::endl;
-	}
-	std::cout << "Time work = " << search_time2 << std::endl;
-	//std::cout << "Time work = " << search_time2 / CLOCKS_PER_SEC << std::endl;
-	res = graph.checkContractionMinmality();
-	unsigned int end_time3 = clock();
-	unsigned int search_time3 = end_time3 - end_time2;
-	if (res) {
-		std::cout << "Result contr min = true" << std::endl;
-	}
-	else {
-		std::cout << "Result contr min = false" << std::endl;
-	}
-	std::cout << "Time work = " << search_time3 << std::endl;
-	//std::cout << "Time work = " << search_time3 / CLOCKS_PER_SEC << std::endl;
-}
-
-void check77() {
+void check6_valid() { // 6-связный граф из статьи
 	int numNode = 15;
 	int numEdge = 0;
 	int k = 6;
@@ -1003,6 +704,226 @@ void check77() {
 	//std::cout << "Time work = " << search_time3 / CLOCKS_PER_SEC << std::endl;
 }
 
+void check7_valid() { // 7-связный граф из статьи
+	int numNode = 19;
+	int numEdge = 0;
+	int k = 7;
+	int numLine = numNode;
+	int numColumn = numNode;
+	Graph graph(numNode, k);
+
+	Matrix matr(numLine, numColumn);
+
+	//0
+	matr.setElem(0, 1, 1);
+	matr.setElem(1, 0, 1);
+	matr.setElem(0, 2, 1);
+	matr.setElem(2, 0, 1);
+	matr.setElem(0, 6, 1);
+	matr.setElem(6, 0, 1);
+	matr.setElem(0, 7, 1);
+	matr.setElem(7, 0, 1);
+	matr.setElem(0, 8, 1);
+	matr.setElem(8, 0, 1);
+	matr.setElem(0, 11, 1);
+	matr.setElem(11, 0, 1);
+	matr.setElem(0, 12, 1);
+	matr.setElem(12, 0, 1);
+	//1
+	matr.setElem(1, 2, 1);
+	matr.setElem(2, 1, 1);
+	matr.setElem(1, 6, 1);
+	matr.setElem(6, 1, 1);
+	matr.setElem(1, 7, 1);
+	matr.setElem(7, 1, 1);
+	matr.setElem(1, 8, 1);
+	matr.setElem(8, 1, 1);
+	matr.setElem(1, 9, 1);
+	matr.setElem(9, 1, 1);
+	matr.setElem(1, 10, 1);
+	matr.setElem(10, 1, 1);
+	//2
+	matr.setElem(2, 8, 1);
+	matr.setElem(8, 2, 1);
+	matr.setElem(2, 9, 1);
+	matr.setElem(9, 2, 1);
+	matr.setElem(2, 10, 1);
+	matr.setElem(10, 2, 1);
+	matr.setElem(2, 11, 1);
+	matr.setElem(11, 2, 1);
+	matr.setElem(2, 12, 1);
+	matr.setElem(12, 2, 1);
+	//3
+	matr.setElem(3, 4, 1);
+	matr.setElem(4, 3, 1);
+	matr.setElem(3, 5, 1);
+	matr.setElem(5, 3, 1);
+	matr.setElem(3, 6, 1);
+	matr.setElem(6, 3, 1);
+	matr.setElem(3, 7, 1);
+	matr.setElem(7, 3, 1);
+	matr.setElem(3, 8, 1);
+	matr.setElem(8, 3, 1);
+	matr.setElem(3, 11, 1);
+	matr.setElem(11, 3, 1);
+	matr.setElem(3, 12, 1);
+	matr.setElem(12, 3, 1);
+	//4
+	matr.setElem(4, 5, 1);
+	matr.setElem(5, 4, 1);
+	matr.setElem(4, 6, 1);
+	matr.setElem(6, 4, 1);
+	matr.setElem(4, 7, 1);
+	matr.setElem(7, 4, 1);
+	matr.setElem(4, 8, 1);
+	matr.setElem(8, 4, 1);
+	matr.setElem(4, 9, 1);
+	matr.setElem(9, 4, 1);
+	matr.setElem(4, 10, 1);
+	matr.setElem(10, 4, 1);
+	//5
+	matr.setElem(5, 8, 1);
+	matr.setElem(8, 5, 1);
+	matr.setElem(5, 9, 1);
+	matr.setElem(9, 5, 1);
+	matr.setElem(5, 10, 1);
+	matr.setElem(10, 5, 1);
+	matr.setElem(5, 11, 1);
+	matr.setElem(11, 5, 1);
+	matr.setElem(5, 12, 1);
+	matr.setElem(12, 5, 1);
+	//6
+	//7
+	//8
+	//9
+	//10
+	//11
+	//12
+	
+	//13
+	matr.setElem(13, 14, 1);
+	matr.setElem(14, 13, 1);
+	matr.setElem(13, 15, 1);
+	matr.setElem(15, 13, 1);
+	matr.setElem(13, 6, 1);
+	matr.setElem(6, 13, 1);
+	matr.setElem(13, 7, 1);
+	matr.setElem(7, 13, 1);
+	matr.setElem(13, 8, 1);
+	matr.setElem(8, 13, 1);
+	matr.setElem(13, 11, 1);
+	matr.setElem(11, 13, 1);
+	matr.setElem(13, 12, 1);
+	matr.setElem(12, 13, 1);
+	//14
+	matr.setElem(14, 15, 1);
+	matr.setElem(15, 14, 1);
+	matr.setElem(14, 6, 1);
+	matr.setElem(6, 14, 1);
+	matr.setElem(14, 7, 1);
+	matr.setElem(7, 14, 1);
+	matr.setElem(14, 8, 1);
+	matr.setElem(8, 14, 1);
+	matr.setElem(14, 9, 1);
+	matr.setElem(9, 14, 1);
+	matr.setElem(14, 10, 1);
+	matr.setElem(10, 14, 1);
+	//15
+	matr.setElem(15, 8, 1);
+	matr.setElem(8, 15, 1);
+	matr.setElem(15, 9, 1);
+	matr.setElem(9, 15, 1);
+	matr.setElem(15, 10, 1);
+	matr.setElem(10, 15, 1);
+	matr.setElem(15, 11, 1);
+	matr.setElem(11, 15, 1);
+	matr.setElem(15, 12, 1);
+	matr.setElem(12, 15, 1);
+	//16
+	matr.setElem(16, 17, 1);
+	matr.setElem(17, 16, 1);
+	matr.setElem(16, 18, 1);
+	matr.setElem(18, 16, 1);
+	matr.setElem(16, 6, 1);
+	matr.setElem(6, 16, 1);
+	matr.setElem(16, 7, 1);
+	matr.setElem(7, 16, 1);
+	matr.setElem(16, 8, 1);
+	matr.setElem(8, 16, 1);
+	matr.setElem(16, 11, 1);
+	matr.setElem(11, 16, 1);
+	matr.setElem(16, 12, 1);
+	matr.setElem(12, 16, 1);
+	//17
+	matr.setElem(17, 18, 1);
+	matr.setElem(18, 17, 1);
+	matr.setElem(17, 6, 1);
+	matr.setElem(6, 17, 1);
+	matr.setElem(17, 7, 1);
+	matr.setElem(7, 17, 1);
+	matr.setElem(17, 8, 1);
+	matr.setElem(8, 17, 1);
+	matr.setElem(17, 9, 1);
+	matr.setElem(9, 17, 1);
+	matr.setElem(17, 10, 1);
+	matr.setElem(10, 17, 1);
+	//18
+	matr.setElem(18, 8, 1);
+	matr.setElem(8, 18, 1);
+	matr.setElem(18, 9, 1);
+	matr.setElem(9, 18, 1);
+	matr.setElem(18, 10, 1);
+	matr.setElem(10, 18, 1);
+	matr.setElem(18, 11, 1);
+	matr.setElem(11, 18, 1);
+	matr.setElem(18, 12, 1);
+	matr.setElem(12, 18, 1);
+
+	graph.set_Matrix(matr);
+	std::vector<Graph> gr;
+	gr.push_back(graph);
+	printToFile(gr, "out_gr.txt");
+
+	unsigned int start_time = clock();
+	bool res = false;
+	res = graph.algorithmEven();
+	//res = graph.algorithmGalil();
+	unsigned int end_time = clock();
+	unsigned int search_time = end_time - start_time;
+	if (res) {
+		std::cout << "Result k-coonected = true" << std::endl;
+	}
+	else {
+		std::cout << "Result k-coonected = false" << std::endl;
+	}
+	std::cout << "Time work = " << search_time << std::endl;
+	//std::cout << "Time work = " << search_time / CLOCKS_PER_SEC << std::endl;
+	res = graph.checkMinGraph();
+	unsigned int end_time2 = clock();
+	unsigned int search_time2 = end_time2 - end_time;
+	if (res) {
+		std::cout << "Result min = true" << std::endl;
+	}
+	else {
+		std::cout << "Result min = false" << std::endl;
+	}
+	std::cout << "Time work = " << search_time2 << std::endl;
+	//std::cout << "Time work = " << search_time2 / CLOCKS_PER_SEC << std::endl;
+	res = graph.checkContractionMinmality();
+	//res = graph.perebor_vertex_check();
+	unsigned int end_time3 = clock();
+	unsigned int search_time3 = end_time3 - end_time2;
+	if (res) {
+		std::cout << "Result contr min = true" << std::endl;
+	}
+	else {
+		std::cout << "Result contr min = false" << std::endl;
+	}
+	std::cout << "Time work = " << search_time3 << std::endl;
+	//std::cout << "Time work = " << search_time3 / CLOCKS_PER_SEC << std::endl;
+}
+
+
 int main(void) {
 	int numNode = 6;
 	int numEdge = 0;
@@ -1017,43 +938,18 @@ int main(void) {
 	int num = 0;
 	std::vector<Graph> arr_graph;
 	std::vector<Graph> all_arr_graph;
-	//check3();
-	//check6();
-	check77();
-	//check();
-	/*Matrix matr(numLine, numColumn);
-	matr.setElem(0, 1, 1);
-	matr.setElem(0, 2, 1);
-	matr.setElem(0, 4, 1);
-	matr.setElem(0, 5, 1);
-	matr.setElem(1, 0, 1);
-	matr.setElem(1, 2, 1);
-	matr.setElem(1, 3, 1);
-	matr.setElem(1, 5, 1);
-	matr.setElem(2, 0, 1);
-	matr.setElem(2, 1, 1);
-	matr.setElem(2, 3, 1);
-	matr.setElem(2, 4, 1);
-	matr.setElem(3, 1, 1);
-	matr.setElem(3, 2, 1);
-	matr.setElem(3, 4, 1);
-	matr.setElem(3, 5, 1);
-	matr.setElem(4, 0, 1);
-	matr.setElem(4, 2, 1);
-	matr.setElem(4, 3, 1);
-	matr.setElem(4, 5, 1);
-	matr.setElem(5, 0, 1);
-	matr.setElem(5, 1, 1);
-	matr.setElem(5, 3, 1);
-	matr.setElem(5, 4, 1);
-	graph.set_Matrix(matr);*/
+
+	//check5_valid();
+	//check6_valid();
+	//check7_valid();
+	//check_regular();
+	//check_full();
 
 	std::cout << std::endl;
 	
 	res = graph.algorithmEven();
 	//res = graph.algorithmGalil();
 	if (res) {
-		//arr_graph.push_back(graph);
 		array_graph.push_back(graph);
 	}
 	all_arr_graph.push_back(graph);
@@ -1062,7 +958,7 @@ int main(void) {
 
 	//enumeration_graph(all_arr_graph, k);
 	start_enumeration_graph(all_arr_graph, k);
-	//fun_fun2(graph, &num, k, &array_graph);
+	//fun(graph, &num, k, &array_graph);
 
 	//thread_graph(graph, k);
 	int numVector = 0;
@@ -1151,7 +1047,5 @@ int main(void) {
 	arr_graph.clear();
 	min_graph.clear();
 	finish_graph.clear();
-
-	//check();
 	return 0;
 }

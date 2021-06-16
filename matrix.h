@@ -30,6 +30,7 @@ public:
 	int getNumColumn();
 	void setNumLine(int num);
 	void setNumColumn(int num);
+	void nullArray();
 	~Matrix();
 private:
 	std::vector<int> arr;

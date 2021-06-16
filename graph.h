@@ -8,24 +8,25 @@ const int INF = 1000000000;
 
 class Graph {
 public:
-	Graph() {}
+	Graph() {
+		numNode = 0;
+		numEdge = 0;
+		k = 0;
+		numLine = 0;
+		numColumn = 0;
+		num = 0;
+		minimality = 0;
+		minContraction = 0;
+	}//инициализация
 	~Graph() {}
-
-	int DFS(std::list <std::pair <int, std::pair <int, int> > >& block, std::vector <std::vector <int> >& lay, int& n, int& s, int& t, int cost);
-	void build(std::vector <std::vector <int> >& lay, int& n, int& s, int& t);
-	int Dinitz(int& s, int& t);
-	bool algorithmGalil();
-
-
 	Graph(int numNode_, int k_);
 	bool algorithmEven();
+	bool algorithmGalil();
 	void extraMatrix(int numI, int numJ);
 	Matrix get_Matrix();
 	Matrix get_ExtraMatrix();
 	bool checkMinGraph();
 	bool checkContractionMinmality();
-	bool perebor_vertex();
-	bool perebor_vertex_fun(int &num, std::vector<int> &index);
 	int get_k();
 	int get_numNode();
 	int get_numEdge();
@@ -41,7 +42,7 @@ public:
 	void set_numColumn(int nC);
 	void set_num(int n);
 	bool bfs(Matrix f, std::vector<int>& d, int s, int t);
-	int dfs(int u, int minFlow, Matrix& f, std::vector<int> ptr, std::vector<int> d, int t);
+	int dfs(int u, int minFlow, Matrix& f, std::vector<int> ptr, std::vector<int> d, std::vector<int> &vertex, int t);
 	int dinic(int s, int t);
 	void set_minimality(bool res);
 	void set_minContraction(bool res);
